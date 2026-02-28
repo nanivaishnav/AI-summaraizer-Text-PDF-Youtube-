@@ -1,0 +1,91 @@
+# AI Summarization Project
+
+This repository contains a Flask backend (`env/app.py`) and a React frontend (`frontend/`) that work together to summarize text, PDF files, and YouTube videos using OpenAI's API.
+
+## Local Development
+
+### Backend
+
+1. **Activate the virtual environment** (PowerShell):
+   ```powershell
+   .\env\Scripts\Activate.ps1
+   ```
+
+2. **Install dependencies** (if not already):
+   ```powershell
+   pip install -r requirements.txt
+   # or
+   pip install flask flask-cors python-dotenv openai pymupdf youtube-transcript-api
+   ```
+
+3. **Configure environment variables**
+   - Create a `.env` file at the project root containing:
+     ```ini
+     OPENAI_API_KEY=your_real_key_here
+     # optional: enable mock mode if you don't want to call OpenAI
+     MOCK_SUMMARY=true
+     ```
+   - Or set the variables in your shell:
+     ```powershell
+     $env:OPENAI_API_KEY="your_real_key_here"
+     $env:MOCK_SUMMARY="true"  # or "1"/"yes"
+     ```
+
+4. **Run the server**:
+   ```powershell
+   python env\app.py
+   ```
+   - Defaults to `http://127.0.0.1:5000`.
+
+5. **Mock mode**
+   - When `MOCK_SUMMARY` is truthy or `OPENAI_API_KEY` is missing, the backend returns a placeholder summary instead of querying OpenAI. Useful for offline testing or when your API key is invalid/quota-limited.
+
+
+### Frontend
+
+1. **Navigate to the frontend folder**:
+   ```powershell
+   cd frontend
+   ```
+
+2. **Install dependencies**:
+   ```powershell
+   npm install
+   ```
+
+3. **Start the development server**:
+   ```powershell
+   npm start
+   ```
+   - Open http://localhost:3000 in your browser.
+
+4. **Proxy to backend**
+   - `package.json` already has a proxy entry (`"proxy": "http://localhost:5000"`) so the React app can call `/summarize/*` directly.
+
+
+### REST API Endpoints
+
+| Method | Path               | Description                  |
+|--------|--------------------|------------------------------|
+| POST   | `/summarize/text`  | Accepts JSON/form `{text}`   |
+| POST   | `/summarize/pdf`   | Accepts multipart `file`     |
+| POST   | `/summarize/youtube` | JSON/form `{url}`           |
+
+Use tools/test_api.py to run a quick smoke test against these endpoints.
+
+
+## Testing the API
+
+From the project root run:
+```
+python tools/test_api.py
+```
+
+The script will print status codes and response bodies. In mock mode, the results will be the fake summary text.
+
+
+## Notes
+
+- Remember to revoke exposed API keys and rotate them after sharing.
+- The backend handles CORS and basic error validation.
+- You can tweak or extend the summarization logic in `get_summary`.
